@@ -1,0 +1,34 @@
+#Dependências do Node
+node_modules/
+
+#Arquivos de código compilados
+#Ignora todos os .js gerados na mesma pasta que os .ts:
+*.js
+#NÃO ignora arquivos de configuração padrão que por acaso sejam .js (caso use no futuro):
+!jest.config.js 
+!webpack.config.js
+
+#Se futuramente configurar o tsconfig.json para jogar o código gerado em pastas separadas:
+dist/
+build/
+out/
+
+#Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#Variáveis de ambiente
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+#Configurações locais de IDEs
+.vscode/
+.idea/
+
+#Arquivos inúteis gerados pelo Sistema Operacional
+.DS_Store
+Thumbs.db
