@@ -1,89 +1,119 @@
-//definindo os tipos para as questões, respostas e pesos
-export type Answer = Record<string, string>;
-export type Weight = Record<string, number>;
+//classe weight com vetores de peso
+class Weight {
+    private scores: number[];
 
+    constructor(scores: number[]) {
+        this.scores = scores;
+    }
+
+    //get das notas
+    public getScores(): number[] {
+        return this.scores;
+    }
+}
+
+//classe answer com o nome e o vetor de resposta do aluno
+class Answer {
+    private studentName: string;
+    private values: string[];
+
+    constructor(studentName: string, values: string[]) {
+        this.studentName = studentName;
+        this.values = values;
+    }
+
+    public getStudentName(): string {
+        return this.studentName;
+    }
+
+    public getValues(): string[] {
+        return this.values;
+    }
+}
+
+//classe Exam com a estrutura principal
 class Exam {
     private weight: Weight;
-    private answer: Answer;
-    private exams: Array<Answer>;
+    private answer: Answer; //gabarito
+    private answers: Array<Answer>; //resposta do aluno
 
     constructor(answer: Answer, weight: Weight) {
         this.answer = answer;
         this.weight = weight;
-        this.exams = []; //inicializando a lista de provas
+        this.answers = [];
     }
 
-    //metodo utilizado para adicionar a prova de uma aluno na lista
     public add(exam: Answer): void {
-        this.exams.push(exam);
+        this.answers.push(exam);
     }
 
+    //metodo para calcular a note do aluno
     private calculateScore(studentAnswer: Answer): number {
         let score = 0;
-        //percorrendo as questoes do gabarito
-        for (const question in this.answer) {
-            //somando o peso, se a questao for correta
-            if (studentAnswer[question] === this.answer[question]) {
-                score += this.weight[question] || 0;
+        const officialAnswers = this.answer.getValues();
+        const weights = this.weight.getScores();
+        const studentValues = studentAnswer.getValues();
+
+        //percorrendo o gabarito e comparando as respostas
+        for (let i = 0; i < officialAnswers.length; i++) {
+            if (studentValues[i] === officialAnswers[i]) {
+                score += weights[i] || 0;
             }
         }
         return score;
     }
 
-    //get de todas as notas
     private getAllScores(): number[] {
-        return this.exams.map(exam => this.calculateScore(exam));
+        return this.answers.map(exam => this.calculateScore(exam));
     }
 
-    //metodo avg que retorna a media de todas as notas
     public avg(): number {
         const scores = this.getAllScores();
-        //evitando a divisao por zero
-        if (scores.length === 0) return 0; 
-
-        const total = scores.reduce((acc, current) => acc + current, 0);
+        if (scores.length === 0) return 0;
+        
+        const total = scores.reduce((acc, curr) => acc + curr, 0);
         return total / scores.length;
     }
 
-    //retorna a contagem das menores notas, 1 se nao informado
     public min(count: number = 1): number[] {
-        const scores = this.getAllScores();
-        //ordenando o array de notas em forma crescente
-        return scores.sort((a, b) => a -b).slice(0, count);
+        return this.getAllScores().sort((a, b) => a - b).slice(0, count);
     }
 
-    //retorna contagem das maiores notas, 1 se nao informado
     public max(count: number = 1): number[] {
-        const scores = this.getAllScores();
-        //ordenando o array de notas em forma decescente
-        return scores.sort((a, b) => b - a).slice(0, count);
+        return this.getAllScores().sort((a, b) => b - a).slice(0, count);
     }
 
-    //notas menores que o limite
     public lt(limit: number): number[] {
         return this.getAllScores().filter(score => score < limit);
     }
 
-    //notas maiores que o limite
     public gt(limit: number): number[] {
         return this.getAllScores().filter(score => score > limit);
     }
 }
 
-// --- TESTE ---
+//criando os pesos
+const pesosProva = new Weight([2, 2, 2, 2, 2]);
 
-// 1. Criar os pesos e o gabarito conforme a primeira imagem
-const pesos: Weight = { "1": 2, "2": 2, "3": 2, "4": 2, "5": 2 };
-const gabarito: Answer = { "1": "a", "2": "b", "3": "a", "4": "c", "5": "d" };
+//criando o gabarito
+const gabaritoOficial = new Answer("Gabarito", ["a", "b", "a", "c", "d"]);
 
-// 2. Instanciar a classe
-const sistemaAvaliacao = new Exam(gabarito, pesos);
+//inicializando o sistema de exame
+const sistema = new Exam(gabaritoOficial, pesosProva);
 
-// 3. Criar a prova do aluno (que deveria tirar nota 4.0)
-const provaAluno: Answer = { "1": "a", "2": "b", "3": "b", "4": "b", "5": "b" };
+//cadastrando a prova dos alunos
+const provaAlunoA = new Answer("Aluno A", ["a", "b", "b", "b", "b"]);
+const provaAlunoB = new Answer("Aluno B", ["a", "b", "a", "c", "d"]);
+const testeIan = new Answer("Ian", ["a", "a", "c", "d", "a"]);
+const testeFulano = new Answer("Fulano", ["a", "a", "a", "d", "d"]);
 
-// 4. Adicionar a prova e testar
-sistemaAvaliacao.add(provaAluno);
+sistema.add(provaAlunoA);
+sistema.add(provaAlunoB);
+sistema.add(testeIan);
+sistema.add(testeFulano);
 
-console.log("Média das provas:", sistemaAvaliacao.avg());
-console.log("Nota máxima:", sistemaAvaliacao.max());
+//testando os resultados
+console.log("Média geral:", sistema.avg());
+console.log("Nota máxima:", sistema.max(1));
+console.log("Nota mínima", sistema.min(1));
+console.log("Notas menores que 6:", sistema.lt(6)); 

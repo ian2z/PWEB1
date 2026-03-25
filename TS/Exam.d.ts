@@ -1,3 +1,2 @@
-export type Answer = Record<string, string>;
-export type Weight = Record<string, number>;
+export {};
 //# sourceMappingURL=Exam.d.ts.map
