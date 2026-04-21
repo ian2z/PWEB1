@@ -1,0 +1,21 @@
+<div>
+  <h2 class="font-semibold mb-2">{{ title }}</h2>
+  
+  <div class="space-y-3 min-h-[200px] p-3 bg-white rounded shadow-sm"
+       (dragover)="onDragOver($event)"
+       (drop)="onDrop($event)">
+    
+    @for (task of filteredTasks(); track task.id) {
+      
+      <app-task-card 
+        [task]="task" 
+        (edit)="onEdit($event)" 
+        (delete)="onDelete($event)">
+      </app-task-card>
+      
+    } @empty {
+      <p class="text-xs text-slate-400 text-center mt-4">Nenhuma tarefa.</p>
+    }
+    
+  </div>
+</div>
